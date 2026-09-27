@@ -1,0 +1,2602 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+  <title>INCURSION: MULTIVERSE UNDER SIEGE</title>
+  <meta name="description" content="A 36-hour interdimensional hackathon by the GeeksForGeeks Student Chapter at Bennett University. Choose your sector. Build the impossible.">
+  <meta name="theme-color" content="#07110e">
+  <meta property="og:title" content="INCURSION: MULTIVERSE UNDER SIEGE">
+  <meta property="og:description" content="The multiverse is unstable. Your team is the containment protocol.">
+  <meta property="og:type" content="website">
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400;12..96,500;12..96,600;12..96,700;12..96,800&family=Instrument+Serif:ital@0;1&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+
+  <script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+  <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+
+  <style>
+    :root {
+      --void: #07110e;
+      --void-2: #0c1915;
+      --ink: #dfe7d8;
+      --soft: #aab5a6;
+      --acid: #b7ff3c;
+      --acid-dark: #54791d;
+      --line: rgba(183,255,60,.25);
+      --rust: #c97c47;
+      --violet: #8b85c9;
+      --panel: rgba(14,29,23,.82);
+      --panel-strong: #12241c;
+      --shadow: 0 24px 80px rgba(0,0,0,.32);
+      --display: "Bricolage Grotesque", sans-serif;
+      --serif: "Instrument Serif", serif;
+      --mono: "Space Mono", monospace;
+    }
+
+    :root[data-theme="light"] {
+      --void: #dce4d5;
+      --void-2: #cfd9c9;
+      --ink: #10221b;
+      --soft: #52675b;
+      --acid: #477a0c;
+      --acid-dark: #9ac46e;
+      --line: rgba(16,34,27,.24);
+      --rust: #985129;
+      --violet: #5d5796;
+      --panel: rgba(230,236,224,.86);
+      --panel-strong: #e7eee1;
+      --shadow: 0 24px 80px rgba(39,68,50,.15);
+    }
+
+    * { box-sizing: border-box; }
+    html { scroll-behavior: smooth; background: var(--void); }
+    body {
+      margin: 0;
+      background: var(--void);
+      color: var(--ink);
+      font-family: var(--display);
+      overflow-x: hidden;
+      cursor: default;
+      transition: background .35s ease, color .35s ease;
+    }
+
+    body::before {
+      content: "";
+      position: fixed;
+      z-index: 20;
+      inset: 0;
+      pointer-events: none;
+      opacity: .08;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 180 180' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='.34'/%3E%3C/svg%3E");
+      mix-blend-mode: soft-light;
+    }
+
+    a { color: inherit; text-decoration: none; }
+    button, input, select, textarea { font: inherit; }
+    button { cursor: pointer; }
+    :focus-visible { outline: 2px solid var(--acid); outline-offset: 4px; }
+    ::selection { color: var(--void); background: var(--acid); }
+
+    .mono { font-family: var(--mono); }
+    .serif { font-family: var(--serif); }
+    .eyebrow {
+      font: 700 10px/1.2 var(--mono);
+      letter-spacing: .2em;
+      text-transform: uppercase;
+      color: var(--acid);
+    }
+    .container { width: min(1180px, calc(100% - 48px)); margin: 0 auto; }
+    .section { position: relative; padding: 150px 0; }
+    .section-title {
+      max-width: 720px;
+      margin: 16px 0 0;
+      font-size: clamp(2.7rem, 6.3vw, 6.6rem);
+      line-height: .91;
+      letter-spacing: -.065em;
+      font-weight: 700;
+    }
+    .section-title em {
+      color: var(--acid);
+      font-family: var(--serif);
+      font-weight: 400;
+      letter-spacing: -.02em;
+    }
+    .section-lead {
+      max-width: 530px;
+      color: var(--soft);
+      line-height: 1.7;
+      font-size: 16px;
+    }
+    .reveal {
+      opacity: 0;
+      transform: translateY(28px);
+      transition: opacity .8s ease, transform .8s cubic-bezier(.2,.7,.2,1);
+    }
+    .reveal.is-visible { opacity: 1; transform: translateY(0); }
+    .delay-1 { transition-delay: .1s; }
+    .delay-2 { transition-delay: .18s; }
+    .delay-3 { transition-delay: .27s; }
+
+    .skip-link {
+      position: fixed;
+      top: 8px;
+      left: 8px;
+      z-index: 100;
+      padding: 8px 12px;
+      background: var(--acid);
+      color: var(--void);
+      transform: translateY(-150%);
+    }
+    .skip-link:focus { transform: translateY(0); }
+
+    .startup {
+      position: fixed;
+      inset: 0;
+      z-index: 90;
+      display: grid;
+      place-items: center;
+      background: var(--void);
+      transition: opacity .7s ease, visibility .7s;
+    }
+    .startup.done { opacity: 0; visibility: hidden; pointer-events: none; }
+    .startup-inner { width: min(520px, calc(100% - 48px)); }
+    .startup-brand {
+      display: flex;
+      justify-content: space-between;
+      color: var(--soft);
+      font: 10px var(--mono);
+      letter-spacing: .14em;
+      text-transform: uppercase;
+      margin-bottom: 24px;
+    }
+    .startup-code {
+      font: 700 clamp(2.4rem, 8vw, 5rem)/.9 var(--display);
+      letter-spacing: -.08em;
+      margin: 0 0 28px;
+    }
+    .startup-code span { color: var(--acid); }
+    .startup-bar {
+      height: 2px;
+      background: rgba(183,255,60,.16);
+      overflow: hidden;
+    }
+    .startup-bar i {
+      display: block;
+      height: 100%;
+      width: 0;
+      background: var(--acid);
+      animation: bootbar 2.45s cubic-bezier(.2,.7,.2,1) forwards;
+    }
+    .startup-status {
+      display: flex;
+      justify-content: space-between;
+      margin-top: 12px;
+      color: var(--soft);
+      font: 10px var(--mono);
+      letter-spacing: .1em;
+      text-transform: uppercase;
+    }
+    .startup-skip {
+      margin-top: 36px;
+      background: transparent;
+      border: 1px solid var(--line);
+      color: var(--soft);
+      padding: 11px 14px;
+      font: 10px var(--mono);
+      letter-spacing: .14em;
+      text-transform: uppercase;
+    }
+    .startup-skip:hover { color: var(--acid); border-color: var(--acid); }
+    @keyframes bootbar { to { width: 100%; } }
+
+    .site-nav {
+      position: fixed;
+      z-index: 50;
+      top: 0;
+      width: 100%;
+      height: 74px;
+      display: flex;
+      align-items: center;
+      background: linear-gradient(180deg, rgba(7,17,14,.92), rgba(7,17,14,0));
+      transition: background .3s;
+    }
+    [data-theme="light"] .site-nav {
+      background: linear-gradient(180deg, rgba(220,228,213,.94), rgba(220,228,213,0));
+    }
+    .nav-inner {
+      width: min(1320px, calc(100% - 48px));
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin: 0 auto;
+    }
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font: 700 12px var(--mono);
+      letter-spacing: .08em;
+    }
+    .brand-mark {
+      width: 22px;
+      height: 22px;
+      display: grid;
+      place-items: center;
+      border: 1px solid var(--acid);
+      color: var(--acid);
+      transform: rotate(45deg);
+    }
+    .brand-mark span { transform: rotate(-45deg); font-size: 11px; }
+    .nav-links { display: flex; gap: 28px; align-items: center; }
+    .nav-links a {
+      color: var(--soft);
+      font: 10px var(--mono);
+      letter-spacing: .11em;
+      text-transform: uppercase;
+    }
+    .nav-links a:hover { color: var(--acid); }
+    .nav-actions { display: flex; align-items: center; gap: 9px; }
+    .icon-button {
+      width: 35px;
+      height: 35px;
+      display: grid;
+      place-items: center;
+      border: 1px solid var(--line);
+      background: transparent;
+      color: var(--ink);
+    }
+    .icon-button:hover { border-color: var(--acid); color: var(--acid); }
+    .theme-sun { display: none; }
+    [data-theme="light"] .theme-moon { display: none; }
+    [data-theme="light"] .theme-sun { display: block; }
+
+    .sound-button {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      width: auto;
+      padding: 0 10px;
+      font: 9px var(--mono);
+      letter-spacing: .08em;
+    }
+    .eq { display: flex; align-items: end; gap: 2px; height: 13px; }
+    .eq i { display: block; width: 2px; height: 5px; background: currentColor; }
+    .sound-on .eq i:nth-child(1) { animation: eq .65s ease-in-out infinite alternate; }
+    .sound-on .eq i:nth-child(2) { animation: eq .5s .12s ease-in-out infinite alternate; }
+    .sound-on .eq i:nth-child(3) { animation: eq .8s .2s ease-in-out infinite alternate; }
+    @keyframes eq { to { height: 13px; } }
+
+    .hero {
+      min-height: 100svh;
+      display: grid;
+      align-items: end;
+      position: relative;
+      overflow: hidden;
+      border-bottom: 1px solid var(--line);
+    }
+    #hero-canvas {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      opacity: .86;
+    }
+    .hero-grid {
+      position: absolute;
+      inset: 0;
+      background-image:
+        linear-gradient(rgba(183,255,60,.055) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(183,255,60,.055) 1px, transparent 1px);
+      background-size: 86px 86px;
+      mask-image: linear-gradient(90deg, transparent, #000 30%, #000 75%, transparent);
+      transform: perspective(800px) rotateX(62deg) scale(1.6) translateY(15%);
+      transform-origin: bottom;
+      opacity: .46;
+    }
+    .hero-vignette {
+      position: absolute;
+      inset: 0;
+      background: radial-gradient(
+        circle at 71% 43%,
+        transparent 0 11%,
+        rgba(7,17,14,.2) 33%,
+        var(--void) 83%
+      );
+    }
+    .hero-copy {
+      position: relative;
+      z-index: 2;
+      width: min(1320px, calc(100% - 48px));
+      margin: auto auto 0;
+      padding: 170px 0 76px;
+    }
+    .hero-kicker {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      color: var(--acid);
+      font: 10px var(--mono);
+      letter-spacing: .2em;
+      text-transform: uppercase;
+    }
+    .hero-kicker::before {
+      content: "";
+      display: block;
+      width: 40px;
+      height: 1px;
+      background: var(--acid);
+    }
+    .hero h1 {
+      max-width: 1000px;
+      margin: 20px 0 26px;
+      font-size: clamp(4rem, 12.4vw, 12rem);
+      line-height: .78;
+      letter-spacing: -.095em;
+      font-weight: 800;
+      text-wrap: balance;
+    }
+    .hero h1 span { display: block; color: var(--acid); }
+    .hero h1 small {
+      font-size: .38em;
+      letter-spacing: -.04em;
+      color: var(--soft);
+      vertical-align: .36em;
+      margin-left: .12em;
+    }
+    .hero-bottom {
+      display: flex;
+      justify-content: space-between;
+      align-items: end;
+      gap: 32px;
+      border-top: 1px solid var(--line);
+      padding-top: 19px;
+    }
+    .hero-intro {
+      max-width: 370px;
+      color: var(--soft);
+      font-size: 15px;
+      line-height: 1.55;
+      margin: 0;
+    }
+    .hero-meta {
+      display: grid;
+      grid-template-columns: repeat(3, auto);
+      gap: 26px;
+      text-align: right;
+    }
+    .meta-label {
+      display: block;
+      color: var(--soft);
+      font: 9px var(--mono);
+      letter-spacing: .1em;
+      text-transform: uppercase;
+      margin-bottom: 6px;
+    }
+    .meta-value { font: 700 13px var(--mono); color: var(--ink); }
+    .meta-value strong { color: var(--acid); font-weight: 700; }
+    .countdown { display: inline-block; color: var(--acid); font-size: 11px; letter-spacing: .02em; }
+    .hero-scroll {
+      position: absolute;
+      bottom: 31px;
+      right: 26px;
+      writing-mode: vertical-rl;
+      color: var(--soft);
+      font: 9px var(--mono);
+      letter-spacing: .15em;
+      text-transform: uppercase;
+    }
+    .hero-scroll::after {
+      content: "";
+      display: inline-block;
+      width: 1px;
+      height: 38px;
+      margin-top: 10px;
+      background: var(--acid);
+    }
+    .cta {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 20px;
+      border: 1px solid var(--acid);
+      color: var(--void);
+      background: var(--acid);
+      padding: 15px 19px;
+      font: 700 11px var(--mono);
+      letter-spacing: .08em;
+      text-transform: uppercase;
+      transition: transform .25s, background .25s, color .25s;
+    }
+    .cta:hover { transform: translateY(-3px); background: transparent; color: var(--acid); }
+    .cta .arrow { font-size: 17px; line-height: 0; }
+    .cta-ghost { background: transparent; color: var(--acid); }
+
+    .signal-strip {
+      padding: 18px 0;
+      border-bottom: 1px solid var(--line);
+      background: rgba(183,255,60,.035);
+      overflow: hidden;
+    }
+    .signal-track {
+      display: flex;
+      width: max-content;
+      animation: marquee 25s linear infinite;
+    }
+    .signal-item {
+      display: flex;
+      align-items: center;
+      gap: 24px;
+      padding: 0 24px;
+      color: var(--soft);
+      font: 10px var(--mono);
+      letter-spacing: .14em;
+      text-transform: uppercase;
+      white-space: nowrap;
+    }
+    .signal-item b { color: var(--acid); font-size: 14px; }
+    @keyframes marquee { to { transform: translateX(-50%); } }
+
+    .briefing { overflow: hidden; }
+    .brief-grid {
+      display: grid;
+      grid-template-columns: 1.05fr .95fr;
+      gap: 9vw;
+      align-items: end;
+    }
+    .brief-statement {
+      font: 400 clamp(2.2rem, 5vw, 5.4rem)/.97 var(--serif);
+      letter-spacing: -.045em;
+    }
+    .brief-statement i { color: var(--acid); }
+    .annotation {
+      border-left: 1px solid var(--acid);
+      padding-left: 20px;
+      margin-top: 42px;
+      color: var(--soft);
+      font: 12px/1.7 var(--mono);
+    }
+    .annotation b { color: var(--ink); font-weight: 700; }
+    .terminal-card {
+      position: relative;
+      margin-top: 74px;
+      padding: 22px;
+      border: 1px solid var(--line);
+      background: linear-gradient(130deg, rgba(183,255,60,.06), transparent 50%), var(--panel);
+      box-shadow: var(--shadow);
+    }
+    .terminal-card::before {
+      content: "TRANSMISSION 004 / EYES ONLY";
+      position: absolute;
+      top: -9px;
+      left: 17px;
+      padding: 0 8px;
+      background: var(--void);
+      color: var(--acid);
+      font: 9px var(--mono);
+      letter-spacing: .12em;
+    }
+    .terminal-top {
+      display: flex;
+      justify-content: space-between;
+      color: var(--soft);
+      font: 9px var(--mono);
+      padding-bottom: 17px;
+      border-bottom: 1px solid var(--line);
+    }
+    .terminal-body {
+      padding: 30px 5px 15px;
+      font: 16px/1.65 var(--mono);
+      color: var(--ink);
+    }
+    .terminal-body .cursor {
+      display: inline-block;
+      width: 8px;
+      height: 17px;
+      background: var(--acid);
+      vertical-align: -2px;
+      animation: blink 1s steps(2) infinite;
+    }
+    @keyframes blink { 50% { opacity: 0; } }
+
+    .axis {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1px;
+      margin-top: 110px;
+      background: var(--line);
+    }
+    .axis-cell { min-height: 170px; padding: 21px; background: var(--void); }
+    .axis-cell b {
+      display: block;
+      font-size: 34px;
+      color: var(--acid);
+      letter-spacing: -.06em;
+    }
+    .axis-cell span {
+      color: var(--soft);
+      font: 10px var(--mono);
+      text-transform: uppercase;
+      letter-spacing: .12em;
+    }
+
+    .relic-section {
+      padding-top: 100px;
+      background: radial-gradient(
+        circle at 72% 47%,
+        rgba(183,255,60,.08),
+        transparent 29%
+      );
+    }
+    .relic-grid {
+      display: grid;
+      grid-template-columns: .84fr 1.16fr;
+      gap: 5vw;
+      align-items: center;
+    }
+    .relic-stage {
+      position: relative;
+      min-height: 590px;
+      border: 1px solid var(--line);
+      overflow: hidden;
+      background:
+        radial-gradient(circle at 50% 43%, rgba(183,255,60,.09), transparent 29%),
+        rgba(8,19,15,.32);
+    }
+    #relic-canvas {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      cursor: grab;
+    }
+    #relic-canvas:active { cursor: grabbing; }
+
+    .stage-label {
+      position: absolute;
+      z-index: 2;
+      font: 9px var(--mono);
+      color: var(--soft);
+      letter-spacing: .12em;
+      text-transform: uppercase;
+    }
+    .stage-label.top { top: 17px; left: 18px; }
+    .stage-label.bottom { right: 18px; bottom: 17px; color: var(--acid); }
+    .stage-cross {
+      position: absolute;
+      z-index: 2;
+      left: 50%;
+      top: 50%;
+      width: 36px;
+      height: 36px;
+      transform: translate(-50%,-50%);
+      opacity: .45;
+      pointer-events: none;
+    }
+    .stage-cross::before, .stage-cross::after {
+      content: "";
+      position: absolute;
+      background: var(--acid);
+    }
+    .stage-cross::before { width: 100%; height: 1px; top: 18px; }
+    .stage-cross::after { width: 1px; height: 100%; left: 18px; }
+
+    .relic-copy .section-title { font-size: clamp(3rem, 6vw, 6.8rem); }
+    .relic-list {
+      list-style: none;
+      padding: 0;
+      margin: 38px 0;
+      border-top: 1px solid var(--line);
+    }
+    .relic-list li {
+      display: grid;
+      grid-template-columns: 32px 1fr;
+      gap: 10px;
+      padding: 17px 0;
+      border-bottom: 1px solid var(--line);
+      color: var(--soft);
+      font-size: 14px;
+      line-height: 1.5;
+    }
+    .relic-list li::before {
+      content: "↳";
+      color: var(--acid);
+      font-family: var(--mono);
+    }
+
+    .timeline-section { overflow: hidden; }
+    .timeline-head {
+      display: flex;
+      justify-content: space-between;
+      align-items: end;
+      gap: 30px;
+      margin-bottom: 70px;
+    }
+    .timeline-head .section-title { max-width: 620px; }
+    .timeline-clock {
+      text-align: right;
+      color: var(--soft);
+      font: 10px/1.6 var(--mono);
+      letter-spacing: .1em;
+      text-transform: uppercase;
+    }
+    .timeline-clock strong {
+      display: block;
+      color: var(--acid);
+      font-size: 22px;
+      letter-spacing: 0;
+    }
+    .rift-timeline { position: relative; margin-left: 22px; }
+    .rift-line {
+      position: absolute;
+      left: 0;
+      top: 0;
+      bottom: 0;
+      width: 1px;
+      background: rgba(183,255,60,.17);
+    }
+    .rift-progress {
+      position: absolute;
+      left: 0;
+      top: 0;
+      width: 2px;
+      height: var(--timeline-progress, 0%);
+      background: var(--acid);
+      box-shadow: 0 0 18px rgba(183,255,60,.4);
+      transform-origin: top;
+    }
+    .timeline-item {
+      position: relative;
+      display: grid;
+      grid-template-columns: 160px 1fr;
+      gap: 34px;
+      padding: 0 0 74px 44px;
+    }
+    .timeline-dot {
+      position: absolute;
+      left: -5px;
+      top: 3px;
+      width: 11px;
+      height: 11px;
+      border: 1px solid var(--acid);
+      background: var(--void);
+      transform: rotate(45deg);
+    }
+    .timeline-item.active .timeline-dot {
+      background: var(--acid);
+      box-shadow: 0 0 0 6px rgba(183,255,60,.08);
+    }
+    .timeline-time { color: var(--acid); font: 11px var(--mono); letter-spacing: .08em; }
+    .timeline-content h3 { margin: 0 0 10px; font-size: 27px; letter-spacing: -.04em; }
+    .timeline-content p {
+      margin: 0;
+      max-width: 510px;
+      color: var(--soft);
+      font-size: 14px;
+      line-height: 1.6;
+    }
+    .timeline-tag {
+      display: inline-block;
+      margin-top: 16px;
+      padding: 5px 8px;
+      border: 1px solid var(--line);
+      color: var(--soft);
+      font: 9px var(--mono);
+      letter-spacing: .1em;
+      text-transform: uppercase;
+    }
+
+    .sectors { padding-bottom: 170px; }
+    .sectors-grid {
+      display: grid;
+      grid-template-columns: 1.2fr .8fr;
+      gap: 2px;
+      background: var(--line);
+      margin-top: 70px;
+    }
+    .sector {
+      min-height: 235px;
+      padding: 27px;
+      background: var(--panel);
+      position: relative;
+      overflow: hidden;
+      transition: background .3s, transform .3s;
+    }
+    .sector:hover {
+      background: var(--panel-strong);
+      transform: translateY(-5px);
+      z-index: 2;
+    }
+    .sector:nth-child(2), .sector:nth-child(3) { background: rgba(201,124,71,.07); }
+    .sector:nth-child(4) { background: rgba(139,133,201,.09); }
+    .sector-index { color: var(--acid); font: 10px var(--mono); }
+    .sector h3 { margin: 51px 0 9px; font-size: 28px; letter-spacing: -.04em; }
+    .sector p {
+      margin: 0;
+      color: var(--soft);
+      font: 13px/1.55 var(--mono);
+      max-width: 380px;
+    }
+    .sector-bounty {
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+      gap: 16px;
+      margin-top: 24px;
+      padding-top: 14px;
+      border-top: 1px solid var(--line);
+      color: var(--soft);
+      font: 9px var(--mono);
+      letter-spacing: .1em;
+      text-transform: uppercase;
+    }
+    .sector-bounty strong { color: var(--acid); font-size: 17px; letter-spacing: -.03em; }
+    .sector-line {
+      position: absolute;
+      right: 25px;
+      top: 28px;
+      width: 38px;
+      height: 38px;
+      border: 1px solid var(--line);
+      border-radius: 50%;
+    }
+    .sector-line::before {
+      content: "";
+      position: absolute;
+      left: 18px;
+      top: -8px;
+      height: 54px;
+      border-left: 1px solid var(--line);
+      transform: rotate(45deg);
+    }
+
+    .rules-layout {
+      display: grid;
+      grid-template-columns: .75fr 1.25fr;
+      gap: 9vw;
+      align-items: start;
+    }
+    .rules-note {
+      color: var(--soft);
+      font: 12px/1.7 var(--mono);
+      border-left: 1px solid var(--rust);
+      padding-left: 19px;
+      margin-top: 35px;
+    }
+    .rules-note strong {
+      display: block;
+      color: var(--rust);
+      margin-bottom: 8px;
+      text-transform: uppercase;
+      letter-spacing: .14em;
+      font-size: 10px;
+    }
+    .faq-list { border-top: 1px solid var(--line); }
+    .faq { border-bottom: 1px solid var(--line); }
+    .faq button {
+      width: 100%;
+      display: flex;
+      justify-content: space-between;
+      gap: 20px;
+      text-align: left;
+      color: var(--ink);
+      background: transparent;
+      border: 0;
+      padding: 22px 0;
+      font-size: 17px;
+    }
+    .faq button span:last-child {
+      color: var(--acid);
+      font: 18px var(--mono);
+      transition: transform .3s;
+    }
+    .faq.open button span:last-child { transform: rotate(45deg); }
+    .faq-answer {
+      display: grid;
+      grid-template-rows: 0fr;
+      transition: grid-template-rows .35s ease;
+    }
+    .faq.open .faq-answer { grid-template-rows: 1fr; }
+    .faq-answer > div { overflow: hidden; color: var(--soft); font: 13px/1.7 var(--mono); }
+    .faq.open .faq-answer > div { padding: 0 50px 22px 0; }
+
+    .finale {
+      min-height: 85vh;
+      display: grid;
+      align-items: center;
+      overflow: hidden;
+      border-top: 1px solid var(--line);
+      background: radial-gradient(
+        circle at 50% 44%,
+        rgba(183,255,60,.13),
+        transparent 35%
+      );
+    }
+    .finale-inner { position: relative; text-align: center; }
+    .finale-ring {
+      position: absolute;
+      left: 50%;
+      top: 50%;
+      width: min(62vw, 720px);
+      aspect-ratio: 1;
+      border: 1px solid var(--line);
+      border-radius: 50%;
+      transform: translate(-50%,-50%);
+      pointer-events: none;
+    }
+    .finale-ring::before, .finale-ring::after {
+      content: "";
+      position: absolute;
+      inset: 8%;
+      border: 1px dashed var(--line);
+      border-radius: 50%;
+      animation: spin 30s linear infinite;
+    }
+    .finale-ring::after {
+      inset: 22%;
+      animation-direction: reverse;
+      animation-duration: 19s;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    .finale h2 {
+      position: relative;
+      margin: 18px auto 28px;
+      max-width: 900px;
+      font-size: clamp(3.7rem, 10vw, 10rem);
+      line-height: .8;
+      letter-spacing: -.09em;
+    }
+    .finale h2 span {
+      color: var(--acid);
+      font-family: var(--serif);
+      font-style: italic;
+      font-weight: 400;
+    }
+    .finale p {
+      position: relative;
+      max-width: 480px;
+      margin: 0 auto 32px;
+      color: var(--soft);
+      line-height: 1.6;
+    }
+    .finale .cta {
+      position: relative;
+      z-index: 10;
+      cursor: pointer;
+    }
+
+    .footer { border-top: 1px solid var(--line); padding: 25px 0 35px; }
+    .footer-inner {
+      display: flex;
+      justify-content: space-between;
+      gap: 20px;
+      color: var(--soft);
+      font: 10px var(--mono);
+      letter-spacing: .08em;
+      text-transform: uppercase;
+    }
+    .footer a:hover { color: var(--acid); }
+
+    .reticle {
+      position: fixed;
+      pointer-events: none;
+      z-index: 45;
+      width: 36px;
+      height: 36px;
+      transform: translate(-50%,-50%);
+      opacity: .65;
+      transition: opacity .2s;
+    }
+    .reticle::before, .reticle::after {
+      content: "";
+      position: absolute;
+      inset: 0;
+      border: 1px solid var(--acid);
+      border-radius: 50%;
+    }
+    .reticle::after { inset: 9px; border-color: var(--rust); }
+    .reticle i, .reticle b { position: absolute; background: var(--acid); }
+    .reticle i { width: 5px; height: 1px; left: -4px; top: 18px; }
+    .reticle b { height: 5px; width: 1px; left: 18px; top: -4px; }
+
+    .modal-backdrop {
+      position: fixed;
+      z-index: 80;
+      inset: 0;
+      display: grid;
+      place-items: center;
+      padding: 24px;
+      background: rgba(3,9,7,.76);
+      backdrop-filter: blur(12px);
+      opacity: 0;
+      visibility: hidden;
+      transition: opacity .3s, visibility .3s;
+    }
+    .modal-backdrop.open { opacity: 1; visibility: visible; }
+    .modal {
+      width: min(620px, 100%);
+      max-height: min(760px, 90vh);
+      overflow: auto;
+      background: var(--panel-strong);
+      border: 1px solid var(--acid);
+      box-shadow: 0 0 0 8px rgba(183,255,60,.07), var(--shadow);
+      padding: 28px;
+      transform: translateY(18px);
+      transition: transform .35s;
+    }
+    .modal-backdrop.open .modal { transform: translateY(0); }
+    .modal-header {
+      display: flex;
+      justify-content: space-between;
+      gap: 20px;
+      padding-bottom: 22px;
+      border-bottom: 1px solid var(--line);
+    }
+    .modal-header h2 { margin: 7px 0 0; font-size: 32px; letter-spacing: -.055em; }
+    .modal-close {
+      background: transparent;
+      border: 0;
+      color: var(--soft);
+      font: 24px var(--mono);
+    }
+    .modal-close:hover { color: var(--acid); }
+    .modal-form { padding-top: 23px; }
+    .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 17px; }
+    .field { display: grid; gap: 7px; margin-bottom: 17px; }
+    .field.full { grid-column: 1 / -1; }
+    .field label {
+      color: var(--soft);
+      font: 9px var(--mono);
+      letter-spacing: .13em;
+      text-transform: uppercase;
+    }
+    .field input, .field select {
+      width: 100%;
+      border: 1px solid var(--line);
+      background: rgba(7,17,14,.45);
+      color: var(--ink);
+      padding: 13px 12px;
+      border-radius: 0;
+      outline: 0;
+    }
+    [data-theme="light"] .field input, [data-theme="light"] .field select {
+      background: rgba(255,255,255,.34);
+    }
+    .field input:focus, .field select:focus {
+      border-color: var(--acid);
+      box-shadow: 0 0 0 2px rgba(183,255,60,.1);
+    }
+    .field small { color: var(--soft); font-size: 11px; }
+    .form-submit { width: 100%; margin-top: 5px; }
+    .form-error {
+      color: #ed9b74;
+      font: 11px/1.5 var(--mono);
+      border: 1px solid rgba(237,155,116,.5);
+      padding: 11px;
+      margin: 10px 0 16px;
+    }
+    .clearance { text-align: center; padding: 30px 10px 12px; }
+    .clearance-symbol {
+      width: 68px;
+      height: 68px;
+      display: grid;
+      place-items: center;
+      margin: 0 auto 22px;
+      border: 1px solid var(--acid);
+      color: var(--acid);
+      font: 30px var(--mono);
+      transform: rotate(45deg);
+    }
+    .clearance-symbol span { transform: rotate(-45deg); }
+    .clearance h2 { font-size: 34px; margin: 0 0 10px; letter-spacing: -.05em; }
+    .clearance p { color: var(--soft); font: 12px/1.7 var(--mono); }
+    .loading { opacity: .7; pointer-events: none; }
+
+    @media (max-width: 820px) {
+      .container, .nav-inner, .hero-copy { width: min(100% - 34px, 1180px); }
+      .nav-links { display: none; }
+      .hero-copy { padding-bottom: 52px; }
+      .hero-bottom, .timeline-head, .footer-inner { align-items: start; flex-direction: column; }
+      .hero-meta { grid-template-columns: repeat(3, auto); text-align: left; }
+      .hero-scroll { display: none; }
+      .brief-grid, .relic-grid, .rules-layout { grid-template-columns: 1fr; gap: 50px; }
+      .relic-stage { min-height: 420px; order: 2; }
+      .relic-copy { order: 1; }
+      .sectors-grid { grid-template-columns: 1fr; }
+      .timeline-item { grid-template-columns: 1fr; gap: 10px; padding-bottom: 52px; }
+      .timeline-time { font-size: 10px; }
+      .section { padding: 100px 0; }
+    }
+
+    @media (max-width: 520px) {
+      .brand { font-size: 10px; }
+      .brand > span { max-width: 175px; line-height: 1.1; }
+      .hero h1 { font-size: clamp(3.55rem, 17vw, 6rem); }
+      .hero-meta { gap: 14px; }
+      .meta-value { font-size: 11px; }
+      .axis { margin-top: 62px; }
+      .axis-cell { min-height: 135px; padding: 16px; }
+      .axis-cell b { font-size: 27px; }
+      .form-grid { grid-template-columns: 1fr; gap: 0; }
+      .field.full { grid-column: auto; }
+      .modal { padding: 21px; }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after {
+        scroll-behavior: auto !important;
+        animation-duration: .01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: .01ms !important;
+      }
+      .reveal { opacity: 1; transform: none; }
+      .signal-track { animation: none; }
+      .reticle { display: none; }
+    }
+  </style>
+</head>
+
+<body>
+  <a class="skip-link" href="#main-content">Skip to event briefing</a>
+  <div id="root"></div>
+
+  <script>
+    (function () {
+      "use strict";
+
+      var h = React.createElement;
+
+      // =========================================================================
+      // DUAL-SOURCE SUPERHERO AUDIO CONTROLLER
+      // =========================================================================
+      function MultiverseSuperheroAudio() {
+        this.ctx = null;
+        this.timer = null;
+        this.muted = true;
+        this.isSynthesizing = false;
+
+        // Custom Hero Marvel Superhero Theme
+        this.audio = new Audio("./yevhenastafiev-hero-marvel-superhero-music-526080.mp3");
+        this.audio.loop = true;
+        this.audio.volume = 0.85;
+      }
+
+      MultiverseSuperheroAudio.prototype.initContext = function () {
+        if (!this.ctx) {
+          var AudioContext = window.AudioContext || window.webkitAudioContext;
+          if (AudioContext) {
+            this.ctx = new AudioContext();
+          }
+        }
+        if (this.ctx && this.ctx.state === "suspended") {
+          this.ctx.resume();
+        }
+      };
+
+      MultiverseSuperheroAudio.prototype.playSynthesizedFanfare = function () {
+        var self = this;
+        self.initContext();
+        if (!self.ctx || self.muted) return;
+
+        self.isSynthesizing = true;
+        var now = self.ctx.currentTime + 0.05;
+
+        // Sub-bass impact
+        var sub = self.ctx.createOscillator();
+        var subGain = self.ctx.createGain();
+        sub.type = "sawtooth";
+        sub.frequency.setValueAtTime(65.41, now);
+        sub.frequency.exponentialRampToValueAtTime(32.70, now + 1.8);
+        subGain.gain.setValueAtTime(0.35, now);
+        subGain.gain.exponentialRampToValueAtTime(0.0001, now + 1.8);
+        sub.connect(subGain);
+        subGain.connect(self.ctx.destination);
+        sub.start(now);
+        sub.stop(now + 1.8);
+
+        // Orchestral brass theme progression
+        var notes = [
+          { f: 130.81, dur: 0.65, delay: 0.0 },
+          { f: 155.56, dur: 0.55, delay: 0.7 },
+          { f: 174.61, dur: 0.55, delay: 1.3 },
+          { f: 185.00, dur: 1.85, delay: 1.9 },
+          { f: 261.63, dur: 0.65, delay: 0.0, v: 0.15 },
+          { f: 311.13, dur: 0.55, delay: 0.7, v: 0.15 },
+          { f: 349.23, dur: 0.55, delay: 1.3, v: 0.15 },
+          { f: 369.99, dur: 2.1, delay: 1.9, v: 0.25 }
+        ];
+
+        notes.forEach(function (n) {
+          var osc1 = self.ctx.createOscillator();
+          var osc2 = self.ctx.createOscillator();
+          var filter = self.ctx.createBiquadFilter();
+          var gain = self.ctx.createGain();
+
+          osc1.type = "sawtooth";
+          osc2.type = "sawtooth";
+          osc1.frequency.setValueAtTime(n.f, now + n.delay);
+          osc2.frequency.setValueAtTime(n.f * 1.008, now + n.delay);
+
+          filter.type = "lowpass";
+          filter.frequency.setValueAtTime(320, now + n.delay);
+          filter.frequency.exponentialRampToValueAtTime(1800, now + n.delay + 0.1);
+          filter.frequency.exponentialRampToValueAtTime(400, now + n.delay + n.dur);
+
+          gain.gain.setValueAtTime(0.0001, now + n.delay);
+          gain.gain.exponentialRampToValueAtTime(n.v || 0.22, now + n.delay + 0.08);
+          gain.gain.exponentialRampToValueAtTime(0.0001, now + n.delay + n.dur);
+
+          osc1.connect(filter);
+          osc2.connect(filter);
+          filter.connect(gain);
+          gain.connect(self.ctx.destination);
+
+          osc1.start(now + n.delay);
+          osc2.start(now + n.delay);
+          osc1.stop(now + n.delay + n.dur);
+          osc2.stop(now + n.delay + n.dur);
+        });
+
+        clearTimeout(self.timer);
+        self.timer = setTimeout(function () {
+          if (self.isSynthesizing && !self.muted) {
+            self.playSynthesizedFanfare();
+          }
+        }, 5200);
+      };
+
+      MultiverseSuperheroAudio.prototype.start = function () {
+        var self = this;
+        self.muted = false;
+        self.initContext();
+
+        var promise = self.audio.play();
+        if (promise !== undefined) {
+          promise.catch(function () {
+            self.playSynthesizedFanfare();
+          });
+        }
+      };
+
+      MultiverseSuperheroAudio.prototype.stop = function () {
+        this.muted = true;
+        this.audio.pause();
+        this.isSynthesizing = false;
+        clearTimeout(this.timer);
+        this.timer = null;
+      };
+
+      MultiverseSuperheroAudio.prototype.setMuted = function (muted) {
+        if (muted) {
+          this.stop();
+        } else {
+          this.start();
+        }
+      };
+
+      var soundEngine = new MultiverseSuperheroAudio();
+
+      var EVENT_CONFIG = {
+        name: "INCURSION",
+        subtitle: "MULTIVERSE UNDER SIEGE",
+        host: "GeeksForGeeks Student Chapter",
+        university: "Bennett University",
+        date: "24—25 OCT 2026",
+        timelineDate: "OCTOBER 24-25, 2026",
+        countdownTarget: new Date("2026-10-24T09:00:00+05:30").getTime(),
+        duration: "36 HOURS",
+        venue: "Bennett University / Greater Noida",
+        coordinates: "28.4502° N, 77.5841° E",
+        totalPrizePool: "₹2,50,000+",
+        teamSize: "2—4 BUILDERS",
+        apiEndpoint: "https://script.google.com/macros/s/AKfycbxzL3UpHs_FCtz17x7m4GC2gG9FIOaBsTlPl5XJ_8tpNllyM4grP5G46xvXQweVVWYBGQ/exec",
+        email: "gfg@bennett.edu.in",
+
+        tracks: [
+          {
+            id: "T-01",
+            name: "Quantum AI & Singularity",
+            bounty: "₹65,000",
+            threat: "CRITICAL",
+            desc: "Agents, predictive systems, and local intelligence for impossible decisions."
+          },
+          {
+            id: "T-02",
+            name: "Zero-Knowledge Defense",
+            bounty: "₹65,000",
+            threat: "OMEGA",
+            desc: "Privacy shields, decentralized identity, and resilient trust infrastructure."
+          },
+          {
+            id: "T-03",
+            name: "Spatial AR / Reality Rifts",
+            bounty: "₹60,000",
+            threat: "EXTREME",
+            desc: "Bridge physical and alternate digital realms through spatial interfaces."
+          },
+          {
+            id: "T-04",
+            name: "Planetary Infrastructure & Mesh",
+            bounty: "₹60,000",
+            threat: "ELEVATED",
+            desc: "Resilient edge networks, IoT fail-safes, and sustainable logistics grids."
+          }
+        ],
+
+        schedule: [
+          {
+            time: "08:30 IST",
+            day: "DAY 01",
+            event: "Registration & Check-in",
+            status: "PASSIVE",
+            desc: "Identity checks, squad formation, and sector selection."
+          },
+          {
+            time: "10:30 IST",
+            day: "DAY 01",
+            event: "Opening Directive & Keynote",
+            status: "CRITICAL",
+            desc: "The breach brief lands. All cells receive their first coordinates."
+          },
+          {
+            time: "12:00 IST",
+            day: "DAY 01",
+            event: "Hackathon Commences",
+            status: "ACTIVE",
+            desc: "Reality breach active. Build the first working version."
+          },
+          {
+            time: "20:00 IST",
+            day: "DAY 01",
+            event: "Evaluation Checkpoint I",
+            status: "ACTIVE",
+            desc: "Show the failure, the signal, and the next move."
+          },
+          {
+            time: "00:00 IST",
+            day: "DAY 02",
+            event: "Midnight CTF & Anomaly Raid",
+            status: "SIDE-QUEST",
+            desc: "A late-night systems challenge for cells still online."
+          },
+          {
+            time: "08:00 IST",
+            day: "DAY 02",
+            event: "Evaluation Checkpoint II",
+            status: "ACTIVE",
+            desc: "Cut the noise. Prove the core interaction."
+          },
+          {
+            time: "12:00 IST",
+            day: "DAY 02",
+            event: "Code Freeze & Pitch Arena",
+            status: "CRITICAL",
+            desc: "Freeze scope, polish the demo, and prepare the final transmission."
+          },
+          {
+            time: "16:00 IST",
+            day: "DAY 02",
+            event: "Victor Coronation & Awards",
+            status: "FINAL",
+            desc: "The High Council names the cells that held the line."
+          }
+        ]
+      };
+
+      var prefersReduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+      function Icon(props) {
+        var paths = {
+          moon: "M20.8 15.4A8.9 8.9 0 0 1 8.6 3.2 9 9 0 1 0 20.8 15.4Z",
+          sun: "M12 3V1m0 22v-2M4.2 4.2 2.8 2.8m18.4 18.4-1.4-1.4M3 12H1m22 0h-2M4.2 19.8l-1.4 1.4M21.2 2.8l-1.4 1.4M17 12a5 5 0 1 1-10 0 5 5 0 0 1 10 0Z",
+          x: "M6 6l12 12M18 6 6 18"
+        };
+
+        return h(
+          "svg",
+          {
+            width: props.size || 16,
+            height: props.size || 16,
+            viewBox: "0 0 24 24",
+            fill: "none",
+            stroke: "currentColor",
+            strokeWidth: "1.5",
+            strokeLinecap: "square",
+            strokeLinejoin: "miter",
+            "aria-hidden": "true"
+          },
+          h("path", { d: paths[props.type] })
+        );
+      }
+
+      function Startup(props) {
+        var [countdown, setCountdown] = React.useState(3);
+
+        React.useEffect(function () {
+          if (props.done) return;
+          var timer = setInterval(function () {
+            setCountdown(function (value) {
+              return value > 0 ? value - 1 : 0;
+            });
+          }, 800);
+          return function () { clearInterval(timer); };
+        }, [props.done]);
+
+        return h(
+          "div",
+          {
+            className: "startup" + (props.done ? " done" : ""),
+            role: "status",
+            "aria-live": "polite"
+          },
+          h(
+            "div",
+            { className: "startup-inner" },
+            h(
+              "div",
+              { className: "startup-brand" },
+              h("span", null, "GFG / BU // EVENT OS"),
+              h("span", null, "SYS.2026.10")
+            ),
+            h(
+              "p",
+              { className: "startup-code" },
+              "SECTOR ",
+              h("span", null, "∞"),
+              " BREACH"
+            ),
+            h("div", { className: "startup-bar" }, h("i")),
+            h(
+              "div",
+              { className: "startup-status" },
+              h(
+                "span",
+                null,
+                props.done ? "CLEARANCE GRANTED" : "CALIBRATING REALITY // 0" + countdown
+              ),
+              h("span", null, props.done ? "100%" : "087%")
+            ),
+            !props.done &&
+              h(
+                "button",
+                {
+                  className: "startup-skip",
+                  onClick: props.onSkip
+                },
+                "Enter & engage the signal"
+              )
+          )
+        );
+      }
+
+      function Nav(props) {
+        return h(
+          "nav",
+          {
+            className: "site-nav",
+            "aria-label": "Primary navigation"
+          },
+          h(
+            "div",
+            { className: "nav-inner" },
+            h(
+              "a",
+              {
+                className: "brand",
+                href: "#top",
+                "aria-label": "Incursion home"
+              },
+              h("span", { className: "brand-mark" }, h("span", null, "I")),
+              h("span", null, "GFG STUDENT CHAPTER / BU")
+            ),
+            h(
+              "div",
+              { className: "nav-links" },
+              h("a", { href: "#briefing" }, "Briefing"),
+              h("a", { href: "#protocol" }, "Protocol"),
+              h("a", { href: "#faq" }, "FAQ")
+            ),
+            h(
+              "div",
+              { className: "nav-actions" },
+              h(
+                "button",
+                {
+                  className: "icon-button sound-button " + (props.sound ? "sound-on" : ""),
+                  onClick: props.onSound,
+                  "aria-label": props.sound ? "Mute soundtrack" : "Unmute soundtrack",
+                  title: props.sound ? "Mute soundtrack" : "Unmute soundtrack"
+                },
+                h(
+                  "span",
+                  { className: "eq", "aria-hidden": "true" },
+                  h("i"),
+                  h("i"),
+                  h("i")
+                ),
+                h("span", null, props.sound ? "LIVE" : "MUTE")
+              ),
+              h(
+                "button",
+                {
+                  className: "icon-button",
+                  onClick: props.onTheme,
+                  "aria-label": "Toggle color theme"
+                },
+                h("span", { className: "theme-moon" }, h(Icon, { type: "moon" })),
+                h("span", { className: "theme-sun" }, h(Icon, { type: "sun" }))
+              ),
+              h(
+                "button",
+                {
+                  className: "cta",
+                  onClick: props.onRegister
+                },
+                "Register",
+                h("span", { className: "arrow" }, "↗")
+              )
+            )
+          )
+        );
+      }
+
+      function Countdown() {
+        var [remaining, setRemaining] = React.useState(
+          Math.max(0, EVENT_CONFIG.countdownTarget - Date.now())
+        );
+
+        React.useEffect(function () {
+          function update() {
+            setRemaining(Math.max(0, EVENT_CONFIG.countdownTarget - Date.now()));
+          }
+          update();
+          var timer = setInterval(update, 1000);
+          return function () { clearInterval(timer); };
+        }, []);
+
+        var totalSeconds = Math.floor(remaining / 1000);
+        var days = Math.floor(totalSeconds / 86400);
+        var hours = Math.floor((totalSeconds % 86400) / 3600);
+        var minutes = Math.floor((totalSeconds % 3600) / 60);
+        var seconds = totalSeconds % 60;
+
+        return h(
+          "span",
+          null,
+          String(days).padStart(2, "0") +
+            ":" +
+            String(hours).padStart(2, "0") +
+            ":" +
+            String(minutes).padStart(2, "0") +
+            ":" +
+            String(seconds).padStart(2, "0")
+        );
+      }
+
+      function Hero() {
+        return h(
+          "section",
+          { className: "hero", id: "top" },
+          h("canvas", { id: "hero-canvas", "aria-hidden": "true" }),
+          h("div", { className: "hero-grid" }),
+          h("div", { className: "hero-vignette" }),
+          h(
+            "div",
+            { className: "hero-copy" },
+            h(
+              "div",
+              { className: "hero-kicker reveal" },
+              "A 36-hour build event // Greater Noida"
+            ),
+            h(
+              "h1",
+              { className: "reveal delay-1" },
+              h("span", null, "INCURSION"),
+              "MULTIVERSE",
+              h("small", null, "under"),
+              h("span", null, "SIEGE")
+            ),
+            h(
+              "div",
+              { className: "hero-bottom reveal delay-2" },
+              h(
+                "p",
+                { className: "hero-intro" },
+                "Every reality has a failure point. Find yours, then build the thing that keeps it from collapsing."
+              ),
+              h(
+                "div",
+                { className: "hero-meta" },
+                h(
+                  "div",
+                  null,
+                  h("span", { className: "meta-label" }, "When"),
+                  h("span", { className: "meta-value" }, EVENT_CONFIG.date)
+                ),
+                h(
+                  "div",
+                  null,
+                  h("span", { className: "meta-label" }, "Duration"),
+                  h("span", { className: "meta-value" }, EVENT_CONFIG.duration)
+                ),
+                h(
+                  "div",
+                  null,
+                  h("span", { className: "meta-label" }, "Breach countdown"),
+                  h(
+                    "span",
+                    { className: "meta-value countdown" },
+                    h(Countdown)
+                  )
+                )
+              )
+            )
+          ),
+          h(
+            "div",
+            { className: "hero-scroll", "aria-hidden": "true" },
+            "Scroll to breach"
+          )
+        );
+      }
+
+      function SignalStrip() {
+        var items = [
+          "No spectators. Only operators.",
+          "Bennett University / 28.4502° N",
+          "Build across four sectors.",
+          EVENT_CONFIG.totalPrizePool + " bounty pool",
+          EVENT_CONFIG.teamSize + " per cell"
+        ];
+
+        return h(
+          "div",
+          { className: "signal-strip", "aria-hidden": "true" },
+          h(
+            "div",
+            { className: "signal-track" },
+            items.concat(items).map(function (item, index) {
+              return h(
+                "div",
+                { className: "signal-item", key: index },
+                h("b", null, "✳"),
+                item
+              );
+            })
+          )
+        );
+      }
+
+      function Briefing() {
+        return h(
+          "section",
+          { className: "section briefing", id: "briefing" },
+          h(
+            "div",
+            { className: "container" },
+            h(
+              "div",
+              { className: "brief-grid" },
+              h(
+                "div",
+                { className: "reveal" },
+                h("div", { className: "eyebrow" }, "01 / The briefing"),
+                h(
+                  "h2",
+                  { className: "section-title" },
+                  "The breach is already",
+                  h("em", null, "inside.")
+                ),
+                h(
+                  "p",
+                  { className: "section-lead" },
+                  "Incursion is not another weekend of cloned dashboards. It is a pressure test for people who can see the gap between an impossible brief and a working prototype."
+                ),
+                h(
+                  "div",
+                  { className: "annotation" },
+                  h("b", null, "Directive //"),
+                  " Form a cell of 2—4 builders. Choose one sector. Ship a working answer before the window seals."
+                )
+              ),
+              h(
+                "div",
+                { className: "reveal delay-2" },
+                h(
+                  "div",
+                  { className: "terminal-card" },
+                  h(
+                    "div",
+                    { className: "terminal-top" },
+                    h("span", null, "INCOMING / 004"),
+                    h("span", null, "DECRYPTED")
+                  ),
+                  h(
+                    "div",
+                    { className: "terminal-body" },
+                    "Reality is a system.",
+                    h("br"),
+                    "Systems can be rewritten.",
+                    h("br"),
+                    h(
+                      "span",
+                      { style: { color: "var(--acid)" } },
+                      "Will your cell write the patch? "
+                    ),
+                    h("span", { className: "cursor" })
+                  )
+                ),
+                h(
+                  "div",
+                  { className: "axis" },
+                  h(
+                    "div",
+                    { className: "axis-cell" },
+                    h("b", null, "500+"),
+                    h("span", null, "Battleworld nodes")
+                  ),
+                  h(
+                    "div",
+                    { className: "axis-cell" },
+                    h("b", null, "04"),
+                    h("span", null, "Combat tracks")
+                  )
+                )
+              )
+            )
+          )
+        );
+      }
+
+      function Relic() {
+        return h(
+          "section",
+          { className: "section relic-section", id: "relic" },
+          h(
+            "div",
+            { className: "container relic-grid" },
+            h(
+              "div",
+              { className: "relic-stage reveal" },
+              h("canvas", {
+                id: "relic-canvas",
+                "aria-label": "Animated Doctor Doom relic with cloth physics and dynamic forcefield"
+              }),
+              h("span", { className: "stage-label top" }, "OBJECT / DOOM-616 // OBSIDIAN-VERDANT"),
+              h("span", { className: "stage-label bottom" }, "SHIELD: FORCEFIELD WIND ACTIVE"),
+              h("div", { className: "stage-cross" })
+            ),
+            h(
+              "div",
+              { className: "relic-copy reveal delay-2" },
+              h("div", { className: "eyebrow" }, "02 / The Doom relic"),
+              h(
+                "h2",
+                { className: "section-title" },
+                "Bring your",
+                h("em", null, "strange"),
+                " ideas."
+              ),
+              h(
+                "p",
+                { className: "section-lead" },
+                "A polished build beats a loud pitch. The Doom relic is the visual brief: precise, layered, useful, and fortified by impossible containment shields."
+              ),
+              h(
+                "ul",
+                { className: "relic-list" },
+                h("li", null, "Solve for a real human under an unreal multiversal constraint."),
+                h("li", null, "Use AI, hardware, open source, or resilient engineering."),
+                h("li", null, "Make your demo impossible to ignore when the timeline freezes.")
+              ),
+              h(
+                "button",
+                {
+                  className: "cta cta-ghost",
+                  onClick: function () {
+                    document.getElementById("sectors").scrollIntoView({
+                      behavior: prefersReduced ? "auto" : "smooth"
+                    });
+                  }
+                },
+                "Inspect the sectors",
+                h("span", { className: "arrow" }, "↓")
+              )
+            )
+          )
+        );
+      }
+
+      var timeline = EVENT_CONFIG.schedule.map(function (item) {
+        return [
+          item.day + " / " + item.time,
+          item.event,
+          item.desc,
+          item.status
+        ];
+      });
+
+      function Timeline() {
+        return h(
+          "section",
+          { className: "section timeline-section", id: "protocol" },
+          h(
+            "div",
+            { className: "container" },
+            h(
+              "div",
+              { className: "timeline-head reveal" },
+              h(
+                "div",
+                null,
+                h("div", { className: "eyebrow" }, "03 / The protocol"),
+                h(
+                  "h2",
+                  { className: "section-title" },
+                  "Eight checkpoints.",
+                  h("em", null, "One window.")
+                )
+              ),
+              h(
+                "div",
+                { className: "timeline-clock" },
+                h("strong", null, EVENT_CONFIG.duration),
+                "MAXIMUM BUILD WINDOW"
+              )
+            ),
+            h(
+              "div",
+              { className: "rift-timeline", id: "timeline" },
+              h("div", { className: "rift-line" }),
+              h("div", { className: "rift-progress" }),
+              timeline.map(function (item, index) {
+                return h(
+                  "article",
+                  {
+                    className: "timeline-item reveal",
+                    key: index,
+                    "data-timeline-item": index
+                  },
+                  h("div", { className: "timeline-dot" }),
+                  h("div", { className: "timeline-time" }, item[0]),
+                  h(
+                    "div",
+                    { className: "timeline-content" },
+                    h("h3", null, item[1]),
+                    h("p", null, item[2]),
+                    h("span", { className: "timeline-tag" }, item[3])
+                  )
+                );
+              })
+            )
+          )
+        );
+      }
+
+      function Sectors() {
+        return h(
+          "section",
+          { className: "section sectors", id: "sectors" },
+          h(
+            "div",
+            { className: "container" },
+            h(
+              "div",
+              { className: "reveal" },
+              h("div", { className: "eyebrow" }, "04 / Choose your combat track"),
+              h(
+                "h2",
+                { className: "section-title" },
+                "No safe",
+                h("em", null, "answers.")
+              ),
+              h(
+                "p",
+                { className: "section-lead" },
+                EVENT_CONFIG.totalPrizePool + " across four sectors. Choose the problem space where your cell can make the sharpest intervention."
+              )
+            ),
+            h(
+              "div",
+              { className: "sectors-grid" },
+              EVENT_CONFIG.tracks.map(function (track, index) {
+                return h(
+                  "article",
+                  {
+                    className: "sector reveal delay-" + ((index % 3) + 1),
+                    key: track.id
+                  },
+                  h("span", { className: "sector-index" }, track.id + " // " + track.threat),
+                  h("span", { className: "sector-line" }),
+                  h("h3", null, track.name),
+                  h("p", null, track.desc),
+                  h(
+                    "div",
+                    { className: "sector-bounty" },
+                    h("span", null, "ALLOCATED BOUNTY"),
+                    h("strong", null, track.bounty)
+                  )
+                );
+              })
+            )
+          )
+        );
+      }
+
+      var faqs = [
+        ["Who can enter?", "Students from any discipline or institution can apply. You do not need a computer science degree; you need a team and the nerve to build."],
+        ["Is there a registration fee?", "No. Admission is free for selected cells. Food, caffeine, Wi-Fi, and workspace are fully provided."],
+        ["How large can a team be?", "Cells must contain 2 to 4 builders. Solo operators can still request clearance and will be routed to team formation."],
+        ["What is the prize pool?", "The four combat tracks carry a cumulative bounty of " + EVENT_CONFIG.totalPrizePool + ". Final awards are subject to the event rules."],
+        ["What should I bring?", "Your laptop, charger, student ID, and hardware. A backup plan is even better."],
+        ["What does the jury look for?", "A sharp problem, a working path through it, and evidence that your cell shipped something real. Polish helps. Clarity wins."]
+      ];
+
+      function FAQ() {
+        var [open, setOpen] = React.useState(0);
+
+        return h(
+          "section",
+          { className: "section", id: "faq" },
+          h(
+            "div",
+            { className: "container rules-layout" },
+            h(
+              "div",
+              { className: "reveal" },
+              h("div", { className: "eyebrow" }, "05 / Rules of engagement"),
+              h(
+                "h2",
+                { className: "section-title" },
+                "Read the",
+                h("em", null, "fine print.")
+              ),
+              h(
+                "div",
+                { className: "rules-note" },
+                h("strong", null, "The short version"),
+                "Be kind. Cite what you borrow. Keep your cell moving. No idea is worth making another person smaller."
+              )
+            ),
+            h(
+              "div",
+              { className: "faq-list reveal delay-2" },
+              faqs.map(function (faq, index) {
+                var isOpen = open === index;
+                var answerId = "faq-answer-" + index;
+
+                return h(
+                  "div",
+                  { className: "faq" + (isOpen ? " open" : ""), key: index },
+                  h(
+                    "button",
+                    {
+                      onClick: function () { setOpen(isOpen ? -1 : index); },
+                      "aria-expanded": isOpen,
+                      "aria-controls": answerId
+                    },
+                    h("span", null, faq[0]),
+                    h("span", null, "+")
+                  ),
+                  h(
+                    "div",
+                    { className: "faq-answer", id: answerId, role: "region" },
+                    h("div", null, faq[1])
+                  )
+                );
+              })
+            )
+          )
+        );
+      }
+
+      function Finale(props) {
+        return h(
+          "section",
+          { className: "section finale" },
+          h(
+            "div",
+            { className: "container finale-inner reveal" },
+            h("div", { className: "finale-ring" }),
+            h("div", { className: "eyebrow" }, "06 / Final clearance"),
+            h("h2", null, "Make your mark ", h("span", null, "before it closes.")),
+            h("p", null, "The next version of the world will be built by someone in this room. Bring the first version of yours."),
+            h(
+              "button",
+              {
+                className: "cta",
+                onClick: props.onRegister
+              },
+              "Request clearance",
+              h("span", { className: "arrow" }, "↗")
+            )
+          )
+        );
+      }
+
+      function Footer() {
+        return h(
+          "footer",
+          { className: "footer" },
+          h(
+            "div",
+            { className: "container footer-inner" },
+            h("span", null, "© 2026 GFG Student Chapter / Bennett University"),
+            h("a", { href: "mailto:" + EVENT_CONFIG.email }, EVENT_CONFIG.email),
+            h("span", null, EVENT_CONFIG.coordinates)
+          )
+        );
+      }
+
+      function RegistrationModal(props) {
+        var [form, setForm] = React.useState({
+          name: "",
+          email: "",
+          phone: "",
+          college: "",
+          teamName: "",
+          team: "Solo / help me find a cell",
+          sector: EVENT_CONFIG.tracks[0].name
+        });
+
+        var [state, setState] = React.useState("idle");
+        var [error, setError] = React.useState("");
+
+        React.useEffect(function () {
+          if (!props.open) {
+            setState("idle");
+            setError("");
+          }
+        }, [props.open]);
+
+        React.useEffect(function () {
+          if (!props.open) return;
+          var handleKeyDown = function (event) {
+            if (event.key === "Escape") props.onClose();
+          };
+          document.addEventListener("keydown", handleKeyDown);
+          return function () { document.removeEventListener("keydown", handleKeyDown); };
+        }, [props.open, props.onClose]);
+
+        function change(event) {
+          setForm(Object.assign({}, form, {
+            [event.target.name]: event.target.value
+          }));
+        }
+
+        function submit(event) {
+          event.preventDefault();
+          setState("loading");
+          setError("");
+
+          var payload = Object.assign({}, form, {
+            event: EVENT_CONFIG.name + "_" + EVENT_CONFIG.date.replace(/[^0-9]/g, ""),
+            coordinates: EVENT_CONFIG.coordinates
+          });
+
+          fetch(EVENT_CONFIG.apiEndpoint, {
+            method: "POST",
+            mode: "no-cors",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(payload)
+          })
+            .then(function () {
+              setState("success");
+            })
+            .catch(function () {
+              setState("error");
+              setError("Transmission failed. Check your signal and try again.");
+            });
+        }
+
+        return h(
+          "div",
+          {
+            className: "modal-backdrop" + (props.open ? " open" : ""),
+            role: "dialog",
+            "aria-modal": "true",
+            "aria-labelledby": "registration-title",
+            onMouseDown: function (event) {
+              if (event.target === event.currentTarget) props.onClose();
+            }
+          },
+          h(
+            "div",
+            { className: "modal" },
+            state === "success"
+              ? h(
+                  "div",
+                  { className: "clearance" },
+                  h("div", { className: "clearance-symbol" }, h("span", null, "✓")),
+                  h("h2", null, "Clearance granted."),
+                  h("p", null, "Your transmission reached the control room. Watch your inbox for the next coordinates."),
+                  h(
+                    "button",
+                    { className: "cta", onClick: props.onClose },
+                    "Return to the breach"
+                  )
+                )
+              : h(
+                  "div",
+                  null,
+                  h(
+                    "div",
+                    { className: "modal-header" },
+                    h(
+                      "div",
+                      null,
+                      h("div", { className: "eyebrow" }, "REQUEST / ACCESS"),
+                      h("h2", { id: "registration-title" }, "Enter the cell.")
+                    ),
+                    h(
+                      "button",
+                      {
+                        className: "modal-close",
+                        onClick: props.onClose,
+                        "aria-label": "Close registration"
+                      },
+                      h(Icon, { type: "x", size: 20 })
+                    )
+                  ),
+                  h(
+                    "form",
+                    { className: "modal-form", onSubmit: submit },
+                    h(
+                      "div",
+                      { className: "form-grid" },
+                      h(
+                        "div",
+                        { className: "field" },
+                        h("label", { htmlFor: "name" }, "Operator name"),
+                        h("input", {
+                          id: "name",
+                          name: "name",
+                          required: true,
+                          value: form.name,
+                          onChange: change,
+                          placeholder: "Your full name"
+                        })
+                      ),
+                      h(
+                        "div",
+                        { className: "field" },
+                        h("label", { htmlFor: "email" }, "Signal address"),
+                        h("input", {
+                          id: "email",
+                          type: "email",
+                          name: "email",
+                          required: true,
+                          value: form.email,
+                          onChange: change,
+                          placeholder: "you@university.edu"
+                        })
+                      ),
+                      h(
+                        "div",
+                        { className: "field" },
+                        h("label", { htmlFor: "phone" }, "Comms number"),
+                        h("input", {
+                          id: "phone",
+                          name: "phone",
+                          required: true,
+                          value: form.phone,
+                          onChange: change,
+                          placeholder: "+91 00000 00000"
+                        })
+                      ),
+                      h(
+                        "div",
+                        { className: "field" },
+                        h("label", { htmlFor: "college" }, "Institution"),
+                        h("input", {
+                          id: "college",
+                          name: "college",
+                          required: true,
+                          value: form.college,
+                          onChange: change,
+                          placeholder: "University / college"
+                        })
+                      ),
+                      h(
+                        "div",
+                        { className: "field" },
+                        h("label", { htmlFor: "teamName" }, "Squad name"),
+                        h("input", {
+                          id: "teamName",
+                          name: "teamName",
+                          required: true,
+                          value: form.teamName,
+                          onChange: change,
+                          placeholder: "Name your cell"
+                        })
+                      ),
+                      h(
+                        "div",
+                        { className: "field" },
+                        h("label", { htmlFor: "team" }, "Cell status"),
+                        h(
+                          "select",
+                          {
+                            id: "team",
+                            name: "team",
+                            value: form.team,
+                            onChange: change
+                          },
+                          h("option", null, "Solo / help me find a cell"),
+                          h("option", null, "I have a cell of 2"),
+                          h("option", null, "I have a cell of 3"),
+                          h("option", null, "I have a cell of 4")
+                        )
+                      ),
+                      h(
+                        "div",
+                        { className: "field" },
+                        h("label", { htmlFor: "sector" }, "Combat track"),
+                        h(
+                          "select",
+                          {
+                            id: "sector",
+                            name: "sector",
+                            value: form.sector,
+                            onChange: change
+                          },
+                          EVENT_CONFIG.tracks.map(function (track) {
+                            return h("option", { key: track.id }, track.name);
+                          })
+                        )
+                      )
+                    ),
+                    state === "error" &&
+                      h("div", { className: "form-error", role: "alert" }, error),
+                    h(
+                      "button",
+                      {
+                        className: "cta form-submit" + (state === "loading" ? " loading" : ""),
+                        type: "submit",
+                        disabled: state === "loading"
+                      },
+                      state === "loading" ? "Transmitting clearance request..." : "Transmit request",
+                      h("span", { className: "arrow" }, "↗")
+                    )
+                  )
+                )
+          )
+        );
+      }
+
+      function useReveal() {
+        React.useEffect(function () {
+          var nodes = document.querySelectorAll(".reveal");
+          if (prefersReduced || !("IntersectionObserver" in window)) {
+            nodes.forEach(function (node) { node.classList.add("is-visible"); });
+            return;
+          }
+          var observer = new IntersectionObserver(
+            function (entries) {
+              entries.forEach(function (entry) {
+                if (entry.isIntersecting) {
+                  entry.target.classList.add("is-visible");
+                  observer.unobserve(entry.target);
+                }
+              });
+            },
+            { threshold: .12, rootMargin: "0px 0px -35px" }
+          );
+          nodes.forEach(function (node) { observer.observe(node); });
+          return function () { observer.disconnect(); };
+        }, []);
+      }
+
+      function useTimeline() {
+        React.useEffect(function () {
+          var line = document.getElementById("timeline");
+          if (!line) return;
+
+          function update() {
+            var rect = line.getBoundingClientRect();
+            var viewport = window.innerHeight;
+            var progress = Math.max(0, Math.min(1, (viewport * .68 - rect.top) / rect.height));
+
+            line.style.setProperty("--timeline-progress", progress * 100 + "%");
+            line.querySelectorAll(".timeline-item").forEach(function (item) {
+              var itemRect = item.getBoundingClientRect();
+              item.classList.toggle(
+                "active",
+                itemRect.top < viewport * .7 && itemRect.bottom > viewport * .26
+              );
+            });
+          }
+
+          update();
+          window.addEventListener("scroll", update, { passive: true });
+          window.addEventListener("resize", update);
+          return function () {
+            window.removeEventListener("scroll", update);
+            window.removeEventListener("resize", update);
+          };
+        }, []);
+      }
+
+      // =========================================================================
+      // THREE.JS VIEWPORTS: HERO BACKGROUND & DOCTOR DOOM TURNTABLE
+      // =========================================================================
+      function useScene(canvasId, relic) {
+        React.useEffect(function () {
+          var canvas = document.getElementById(canvasId);
+          if (!canvas || !window.THREE || prefersReduced) return;
+
+          var host = canvas.parentElement;
+          var scene = new THREE.Scene();
+          var camera = new THREE.PerspectiveCamera(relic ? 38 : 32, 1, 0.1, 100);
+          camera.position.set(0, relic ? 0 : 0.25, relic ? 4.6 : 6);
+
+          var renderer;
+          try {
+            renderer = new THREE.WebGLRenderer({
+              canvas: canvas,
+              alpha: true,
+              antialias: true,
+              powerPreference: "high-performance"
+            });
+          } catch (e) {
+            console.warn("WebGL initialization failed.", e);
+            return;
+          }
+
+          renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+          renderer.setClearColor(0, 0);
+
+          var group = new THREE.Group();
+          scene.add(group);
+
+          // Studio Lighting
+          scene.add(new THREE.AmbientLight(0xffffff, relic ? 0.42 : 0.55));
+
+          var greenLight = new THREE.DirectionalLight(0x22c55e, relic ? 2.8 : 2.5);
+          greenLight.position.set(-3.2, 3.0, 3.2);
+          scene.add(greenLight);
+
+          var coldFill = new THREE.DirectionalLight(0xe2e8f0, relic ? 2.0 : 1.5);
+          coldFill.position.set(3.2, 1.2, 2.8);
+          scene.add(coldFill);
+
+          var rimBack = new THREE.DirectionalLight(0x00ff66, 2.5);
+          rimBack.position.set(0, 3.5, -3.5);
+          scene.add(rimBack);
+
+          var clothGeo, initialClothPositions, shieldMesh, shieldRing;
+          var targetRotY = 0;
+          var isDragging = false;
+          var prevMouseX = 0;
+
+          if (relic) {
+            // Obsidian-Verdant Titanium Armor (Blackish-Green)
+            var armorSteelMat = new THREE.MeshStandardMaterial({
+              color: 0x09140f,
+              metalness: 0.94,
+              roughness: 0.28
+            });
+
+            var darkCavity = new THREE.MeshStandardMaterial({
+              color: 0x030705,
+              metalness: 0.98,
+              roughness: 0.45
+            });
+
+            var blackishGreenCloth = new THREE.MeshStandardMaterial({
+              color: 0x05130c,
+              roughness: 0.88,
+              metalness: 0.15,
+              side: THREE.DoubleSide
+            });
+
+            var energyShieldMat = new THREE.MeshStandardMaterial({
+              color: 0x00ff66,
+              emissive: 0x03180c,
+              transparent: true,
+              opacity: 0.22,
+              roughness: 0.15,
+              metalness: 0.85,
+              wireframe: true
+            });
+
+            var eyeLaserMat = new THREE.MeshBasicMaterial({ color: 0x00ff66 });
+
+            // 1. Cranium Core
+            var skullGeo = new THREE.SphereGeometry(0.75, 24, 24);
+            skullGeo.scale(0.96, 1.16, 0.98);
+            var skull = new THREE.Mesh(skullGeo, armorSteelMat);
+            group.add(skull);
+
+            // 2. Concentric Form-Fitting Hood Cowl
+            var cowlGeo = new THREE.SphereGeometry(0.82, 32, 24, Math.PI * 0.72, Math.PI * 1.56, 0, Math.PI * 0.88);
+            var cowl = new THREE.Mesh(cowlGeo, blackishGreenCloth);
+            cowl.position.set(0, 0.04, -0.02);
+            group.add(cowl);
+
+            // 3. Brow Ridge & Nose
+            var brow = new THREE.Mesh(new THREE.BoxGeometry(1.08, 0.14, 0.35), armorSteelMat);
+            brow.position.set(0, 0.24, 0.62);
+            brow.rotation.x = 0.18;
+            group.add(brow);
+
+            var nose = new THREE.Mesh(new THREE.ConeGeometry(0.14, 0.38, 4), armorSteelMat);
+            nose.position.set(0, 0.08, 0.82);
+            nose.rotation.x = -0.25;
+            group.add(nose);
+
+            // 4. Eye Cavities & Piercing Laser Slits
+            [-0.28, 0.28].forEach(function (x, idx) {
+              var sign = idx === 0 ? -1 : 1;
+              var socket = new THREE.Mesh(new THREE.BoxGeometry(0.36, 0.16, 0.25), darkCavity);
+              socket.position.set(x, 0.14, 0.62);
+              socket.rotation.z = sign * 0.08;
+              group.add(socket);
+
+              var slit = new THREE.Mesh(new THREE.BoxGeometry(0.22, 0.045, 0.15), eyeLaserMat);
+              slit.position.set(x, 0.14, 0.74);
+              slit.rotation.z = sign * 0.1;
+              group.add(slit);
+
+              var cheek = new THREE.Mesh(new THREE.BoxGeometry(0.32, 0.52, 0.28), armorSteelMat);
+              cheek.position.set(sign * 0.44, -0.12, 0.52);
+              cheek.rotation.set(0.1, sign * 0.35, -sign * 0.15);
+              group.add(cheek);
+            });
+
+            // 5. Mouth Grille & Respirator Bars
+            var grille = new THREE.Mesh(new THREE.BoxGeometry(0.52, 0.38, 0.32), darkCavity);
+            grille.position.set(0, -0.26, 0.6);
+            group.add(grille);
+
+            for (var b = -3; b <= 3; b++) {
+              var bar = new THREE.Mesh(new THREE.CylinderGeometry(0.016, 0.016, 0.24, 8), armorSteelMat);
+              bar.position.set(b * 0.065, -0.26, 0.77);
+              group.add(bar);
+            }
+
+            var chin = new THREE.Mesh(new THREE.BoxGeometry(0.36, 0.18, 0.28), armorSteelMat);
+            chin.position.set(0, -0.48, 0.58);
+            group.add(chin);
+
+            // 6. Dynamic Cloth Mantle with Real-Time Wind Simulation
+            clothGeo = new THREE.PlaneGeometry(1.8, 1.4, 24, 16);
+            var clothMesh = new THREE.Mesh(clothGeo, blackishGreenCloth);
+            clothMesh.position.set(0, -0.65, -0.45);
+            clothMesh.rotation.y = Math.PI;
+            group.add(clothMesh);
+            initialClothPositions = clothGeo.attributes.position.array.slice();
+
+            // 7. Dynamic Forcefield Energy Shield
+            var shieldGeo = new THREE.IcosahedronGeometry(1.75, 1);
+            shieldMesh = new THREE.Mesh(shieldGeo, energyShieldMat);
+            group.add(shieldMesh);
+
+            shieldRing = new THREE.Mesh(
+              new THREE.TorusGeometry(1.82, 0.015, 8, 64),
+              new THREE.MeshBasicMaterial({ color: 0x22c55e, wireframe: true })
+            );
+            shieldRing.rotation.x = Math.PI / 2.6;
+            group.add(shieldRing);
+
+            // Drag Interaction Controls
+            canvas.addEventListener("mousedown", function (e) {
+              isDragging = true;
+              prevMouseX = e.clientX;
+            });
+            window.addEventListener("mousemove", function (e) {
+              if (!isDragging) return;
+              targetRotY += (e.clientX - prevMouseX) * 0.0075;
+              prevMouseX = e.clientX;
+            });
+            window.addEventListener("mouseup", function () { isDragging = false; });
+
+            canvas.addEventListener("touchstart", function (e) {
+              if (e.touches.length === 1) {
+                isDragging = true;
+                prevMouseX = e.touches[0].clientX;
+              }
+            }, { passive: true });
+            window.addEventListener("touchmove", function (e) {
+              if (isDragging && e.touches.length === 1) {
+                targetRotY += (e.touches[0].clientX - prevMouseX) * 0.008;
+                prevMouseX = e.touches[0].clientX;
+              }
+            }, { passive: true });
+            window.addEventListener("touchend", function () { isDragging = false; });
+          } else {
+            // Hero Multiverse Starfield Background
+            var stars = new THREE.Group();
+            for (var s = 0; s < 45; s++) {
+              var dot = new THREE.Mesh(
+                new THREE.SphereGeometry(0.014 + Math.random() * 0.02, 5, 5),
+                new THREE.MeshBasicMaterial({
+                  color: s % 3 ? 0xa4bb9e : 0xb7ff3c
+                })
+              );
+              dot.position.set(
+                (Math.random() - 0.5) * 6,
+                (Math.random() - 0.5) * 4,
+                (Math.random() - 0.5) * 2.5
+              );
+              stars.add(dot);
+            }
+            scene.add(stars);
+          }
+
+          function resize() {
+            var width = host.clientWidth;
+            var height = host.clientHeight;
+            renderer.setSize(width, height, false);
+            camera.aspect = width / height;
+            camera.updateProjectionMatrix();
+          }
+
+          resize();
+          window.addEventListener("resize", resize);
+
+          var start = performance.now();
+          var frame;
+
+          function animate(now) {
+            var time = (now - start) / 1000;
+
+            if (relic) {
+              if (!isDragging) {
+                targetRotY += 0.008;
+              }
+              group.rotation.y += (targetRotY - group.rotation.y) * 0.08;
+              group.position.y = Math.sin(time * 1.5) * 0.05;
+
+              // Wave calculation on cloth mantle
+              if (clothGeo && initialClothPositions) {
+                var pos = clothGeo.attributes.position;
+                for (var i = 0; i < pos.count; i++) {
+                  var ix = i * 3;
+                  var x = initialClothPositions[ix];
+                  var y = initialClothPositions[ix + 1];
+                  var weight = Math.max(0, 0.7 - y);
+                  var wave1 = Math.sin(x * 3.5 + time * 3.2) * 0.12;
+                  var wave2 = Math.cos(y * 4.0 + time * 4.1) * 0.1;
+                  var gust = Math.sin(time * 1.6) * 0.08;
+                  pos.array[ix + 2] = initialClothPositions[ix + 2] + (wave1 + wave2 + gust) * weight;
+                }
+                pos.needsUpdate = true;
+                clothGeo.computeVertexNormals();
+              }
+
+              // Pulse on forcefield shield
+              if (shieldMesh && shieldRing) {
+                var shieldPulse = 1.0 + Math.sin(time * 3.0) * 0.035;
+                shieldMesh.scale.set(shieldPulse, shieldPulse, shieldPulse);
+                shieldMesh.rotation.y -= 0.005;
+                shieldRing.rotation.z += 0.006;
+              }
+            } else {
+              group.rotation.y = time * 0.03;
+            }
+
+            renderer.render(scene, camera);
+            frame = requestAnimationFrame(animate);
+          }
+
+          frame = requestAnimationFrame(animate);
+
+          return function () {
+            cancelAnimationFrame(frame);
+            window.removeEventListener("resize", resize);
+            renderer.dispose();
+          };
+        }, [canvasId, relic]);
+      }
+
+      function App() {
+        var [booted, setBooted] = React.useState(false);
+        var [modal, setModal] = React.useState(false);
+        var [sound, setSound] = React.useState(function () {
+          return localStorage.getItem("incursion-sound") === "on";
+        });
+        var [theme, setTheme] = React.useState(function () {
+          return localStorage.getItem("incursion-theme") || "dark";
+        });
+
+        useReveal();
+        useTimeline();
+        useScene("hero-canvas", false);
+        useScene("relic-canvas", true);
+
+        React.useEffect(function () {
+          document.documentElement.dataset.theme = theme;
+          localStorage.setItem("incursion-theme", theme);
+        }, [theme]);
+
+        React.useEffect(function () {
+          localStorage.setItem("incursion-sound", sound ? "on" : "off");
+          soundEngine.setMuted(!sound);
+        }, [sound]);
+
+        React.useEffect(function () {
+          var onMove = function (event) {
+            var reticle = document.querySelector(".reticle");
+            if (reticle && !prefersReduced) {
+              reticle.style.left = event.clientX + "px";
+              reticle.style.top = event.clientY + "px";
+            }
+          };
+          window.addEventListener("pointermove", onMove, { passive: true });
+          return function () { window.removeEventListener("pointermove", onMove); };
+        }, []);
+
+        React.useEffect(function () {
+          var timer = setTimeout(function () {
+            setBooted(true);
+          }, 2600);
+          return function () { clearTimeout(timer); };
+        }, []);
+
+        return h(
+          React.Fragment,
+          null,
+          h(Startup, {
+            done: booted,
+            onSkip: function () {
+              setBooted(true);
+              setSound(true);
+              soundEngine.setMuted(false);
+            }
+          }),
+          h(Nav, {
+            sound: sound,
+            onSound: function () {
+              var next = !sound;
+              setSound(next);
+              soundEngine.setMuted(!next);
+            },
+            onTheme: function () {
+              setTheme(theme === "dark" ? "light" : "dark");
+            },
+            onRegister: function () {
+              setModal(true);
+            }
+          }),
+          h(
+            "div",
+            { className: "reticle", "aria-hidden": "true" },
+            h("i"),
+            h("b")
+          ),
+          h(
+            "main",
+            { id: "main-content" },
+            h(Hero),
+            h(SignalStrip),
+            h(Briefing),
+            h(Relic),
+            h(Timeline),
+            h(Sectors),
+            h(FAQ),
+            h(Finale, {
+              onRegister: function () {
+                setModal(true);
+              }
+            })
+          ),
+          h(Footer),
+          h(RegistrationModal, {
+            open: modal,
+            onClose: function () {
+              setModal(false);
+            }
+          })
+        );
+      }
+
+      ReactDOM.createRoot(document.getElementById("root")).render(h(App));
+    }());
+  </script>
+</body>
+</html>
